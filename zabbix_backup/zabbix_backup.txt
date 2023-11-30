@@ -1,0 +1,49 @@
+#Stop zabbix-server
+systemctl stop zabbix-server
+
+#Backup Zabbix components
+mkdir -p /opt/zabbix_backup/bin_files /opt/zabbix_backup/conf_files /opt/zabbix_backup/doc_files
+mkdir -p /opt/zabbix_backup/web_files /opt/zabbix_backup/db_files
+
+cp -rp /etc/zabbix/zabbix_server.conf /opt/zabbix_backup/conf_files
+cp -rp /usr/sbin/zabbix_server /opt/zabbix_backup/bin_files
+cp -rp /usr/share/doc/zabbix-* /opt/zabbix_backup/doc_files
+cp -rp /etc/httpd/conf.d/zabbix.conf /opt/zabbix_backup/conf_files 2>/dev/null
+cp -rp /etc/apache2/conf-enabled/zabbix.conf /opt/zabbix_backup/conf_files 2>/dev/null
+cp -rp /etc/zabbix/php-fpm.conf /opt/zabbix_backup/conf_files 2>/dev/null
+
+cp -rp /usr/share/zabbix/ /opt/zabbix_backup/web_files
+
+#Backup Zabbix database
+mysqldump -h localhost -u'root' --single-transaction 'zabbix' | gzip > /opt/zabbix_backup/db_files/zabbix_backup.sql.gz
+
+.../do things/...
+
+#Restore procedure
+systemctl stop zabbix-server
+
+#Delete database and create a new one with the right permissions
+mysql -u'root' -e "drop database zabbix;"
+mysql -u'root' -e "create database zabbix character set utf8mb4 collate utf8mb4_bin;"
+mysql -u'root' -e "grant all privileges on zabbix.* to zabbix@localhost identified by 'password';"
+
+#Import database from the backup
+zcat /opt/zabbix_backup/db_files/zabbix_backup.sql.gz | mysql -h localhost -u'root' 'zabbix'
+
+#Remove Zabbix web and bin files
+rm -rf /usr/sbin/zabbix_server /usr/share/zabbix
+
+#Restore files from the backup
+cp -rp /opt/zabbix_backup/conf_files/zabbix_server.conf /etc/zabbix/zabbix_server.conf
+cp -rp /opt/zabbix_backup/bin_files/zabbix_server /usr/sbin/zabbix_server
+cp -rp /opt/zabbix_backup/doc_files/zabbix-* /usr/share/doc/
+cp -rp /opt/zabbix_backup/web_files/zabbix /usr/share/zabbix
+cp -rp /opt/zabbix_backup/conf_files/zabbix.conf /etc/httpd/conf.d/zabbix.conf 2>/dev/null
+cp -rp /opt/zabbix_backup/conf_files/zabbix.conf /etc/apache2/conf-enabled/zabbix.conf 2>/dev/null
+cp -rp /opt/zabbix_backup/conf_files/php-fpm.conf /etc/zabbix/php-fpm.conf  2>/dev/null
+
+#Start Zabbix server
+systemctl start zabbix-server
+
+
++ my.cnf, httpd/nginx directories

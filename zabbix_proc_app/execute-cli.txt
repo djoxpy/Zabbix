@@ -1,0 +1,1 @@
+cd /etc/zabbix/; chmod +x zabbix_proc.sh; ./zabbix_proc.sh --allow
