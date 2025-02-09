@@ -1,0 +1,6 @@
+#zabbix
+Cmnd_Alias LETSENCRYPT_DISCOVERY = /etc/zabbix/letsencrypt_discovery.sh
+Defaults:zabbix !requiretty
+Defaults:zabbix !syslog
+
+zabbix ALL = NOPASSWD: LETSENCRYPT_DISCOVERY

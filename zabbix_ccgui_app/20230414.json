@@ -1,0 +1,5 @@
+{"exception":"","db_ip":"127.0.0.1","response_time":"123","table_name":"KPI_PSUP_Usr","timestamp":"2023-04-14 12:41:51","status":"OK"},
+{"exception":"Statement cancelled due to timeout or client request","db_ip":"127.0.0.1","response_time":"-1","table_name":"KPI_PSUP_Usr","timestamp":"2023-04-14 12:42:16","status":"ERROR"},
+{"exception":"","db_ip":"127.0.0.1","response_time":"987","table_name":"KPI_PSUP_Usr","timestamp":"2023-04-14 14:36:43","status":"OK"},
+{"exception":"","db_ip":"127.0.0.2","response_time":"563","table_name":"KPI_PSUP_Usr","timestamp":"2023-04-14 14:41:55","status":"OK"}
+{"exception":"","db_ip":"127.0.0.2","response_time":"555","table_name":"KPI_PSUP_test","timestamp":"2023-04-14 14:41:55","status":"OK"}

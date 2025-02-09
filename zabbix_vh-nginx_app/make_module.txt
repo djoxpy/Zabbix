@@ -1,0 +1,10 @@
+cd /opt
+git clone https://github.com/nginx/nginx.git
+git clone https://github.com/vozlt/nginx-module-vts.git
+cd nginx
+git checkout origin/stable-1.26
+git branch
+auto/configure --with-compat --add-dynamic-module=/opt/nginx-module-vts
+make modules
+mv objs/ngx_http_vhost_traffic_status_module.so objs/ngx_http_vhost_traffic_status_module_1-26.so
+cp objs/ngx_http_vhost_traffic_status_module_1-26.so /etc/nginx/modules

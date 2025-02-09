@@ -1,0 +1,1543 @@
+{
+    "zabbix_export": {
+        "version": "7.0",
+        "template_groups": [
+            {
+                "uuid": "a571c0d144b14fd4a87a9d9b2aa9fcd6",
+                "name": "Templates/Applications"
+            }
+        ],
+        "templates": [
+            {
+                "uuid": "f0db9332c5c341b6b38fe854a20cd05a",
+                "template": "Nginx VH by HTTP",
+                "name": "Nginx VH by HTTP",
+                "groups": [
+                    {
+                        "name": "Templates/Applications"
+                    }
+                ],
+                "items": [
+                    {
+                        "uuid": "f6608b0c38e84c71a1c8a91441797904",
+                        "name": "Nginx: Service response time",
+                        "type": "SIMPLE",
+                        "key": "net.tcp.service.perf[http,\"{HOST.IP}\",\"{$NGINX.VH_STATUS.PORT}\"]",
+                        "value_type": "FLOAT",
+                        "units": "s",
+                        "tags": [
+                            {
+                                "tag": "application",
+                                "value": "nginx"
+                            },
+                            {
+                                "tag": "component",
+                                "value": "application"
+                            },
+                            {
+                                "tag": "component",
+                                "value": "health"
+                            }
+                        ],
+                        "triggers": [
+                            {
+                                "uuid": "5fd7e44943864f7ca487b7548fa602e3",
+                                "expression": "min(/Nginx VH by HTTP/net.tcp.service.perf[http,\"{HOST.IP}\",\"{$NGINX.VH_STATUS.PORT}\"],5m)>{$NGINX.RESPONSE_TIME.MAX.WARN}",
+                                "name": "Nginx: Service response time is too high",
+                                "event_name": "Nginx: Service response time is too high (over {$NGINX.RESPONSE_TIME.MAX.WARN}s for 5m)",
+                                "priority": "WARNING",
+                                "manual_close": "YES",
+                                "dependencies": [
+                                    {
+                                        "name": "Nginx: Service is down",
+                                        "expression": "last(/Nginx VH by HTTP/net.tcp.service[http,\"{HOST.IP}\",\"{$NGINX.VH_STATUS.PORT}\"])=0"
+                                    }
+                                ],
+                                "tags": [
+                                    {
+                                        "tag": "application",
+                                        "value": "nginx"
+                                    },
+                                    {
+                                        "tag": "scope",
+                                        "value": "performance"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "0b56c60ab4a94cc7b1c5bb4146551c39",
+                        "name": "Nginx: Service status",
+                        "type": "SIMPLE",
+                        "key": "net.tcp.service[http,\"{HOST.IP}\",\"{$NGINX.VH_STATUS.PORT}\"]",
+                        "valuemap": {
+                            "name": "Service state"
+                        },
+                        "preprocessing": [
+                            {
+                                "type": "DISCARD_UNCHANGED_HEARTBEAT",
+                                "parameters": [
+                                    "10m"
+                                ]
+                            }
+                        ],
+                        "tags": [
+                            {
+                                "tag": "application",
+                                "value": "nginx"
+                            },
+                            {
+                                "tag": "component",
+                                "value": "application"
+                            },
+                            {
+                                "tag": "component",
+                                "value": "health"
+                            }
+                        ],
+                        "triggers": [
+                            {
+                                "uuid": "25a7a43fe6f34eb8a1f8df9181bd2f4e",
+                                "expression": "last(/Nginx VH by HTTP/net.tcp.service[http,\"{HOST.IP}\",\"{$NGINX.VH_STATUS.PORT}\"])=0",
+                                "name": "Nginx: Service is down",
+                                "priority": "AVERAGE",
+                                "manual_close": "YES",
+                                "tags": [
+                                    {
+                                        "tag": "application",
+                                        "value": "nginx"
+                                    },
+                                    {
+                                        "tag": "scope",
+                                        "value": "availability"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "e06dafd1eaa8475b930d0864fd048948",
+                        "name": "Nginx: Requests accepted per second",
+                        "type": "DEPENDENT",
+                        "key": "nginx.connections.accepted.rate",
+                        "delay": "0",
+                        "history": "7d",
+                        "value_type": "FLOAT",
+                        "trends": "90d",
+                        "description": "The total number of accepted client connections.",
+                        "preprocessing": [
+                            {
+                                "type": "JSONPATH",
+                                "parameters": [
+                                    "$.connections.accepted"
+                                ]
+                            },
+                            {
+                                "type": "CHANGE_PER_SECOND",
+                                "parameters": [
+                                    ""
+                                ]
+                            },
+                            {
+                                "type": "DISCARD_UNCHANGED_HEARTBEAT",
+                                "parameters": [
+                                    "5m"
+                                ]
+                            }
+                        ],
+                        "master_item": {
+                            "key": "nginx.get_stats"
+                        },
+                        "tags": [
+                            {
+                                "tag": "application",
+                                "value": "nginx"
+                            },
+                            {
+                                "tag": "component",
+                                "value": "connections"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "826ec270c2d74eae86847623e348eb67",
+                        "name": "Nginx: Requests accepted total",
+                        "type": "DEPENDENT",
+                        "key": "nginx.connections.accepted.total",
+                        "delay": "0",
+                        "history": "7d",
+                        "value_type": "FLOAT",
+                        "trends": "90d",
+                        "description": "The total number of accepted client connections.",
+                        "preprocessing": [
+                            {
+                                "type": "JSONPATH",
+                                "parameters": [
+                                    "$.connections.accepted"
+                                ]
+                            },
+                            {
+                                "type": "DISCARD_UNCHANGED_HEARTBEAT",
+                                "parameters": [
+                                    "5m"
+                                ]
+                            }
+                        ],
+                        "master_item": {
+                            "key": "nginx.get_stats"
+                        },
+                        "tags": [
+                            {
+                                "tag": "application",
+                                "value": "nginx"
+                            },
+                            {
+                                "tag": "component",
+                                "value": "connections"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "75661998aa2f41efac2041d31ee5872b",
+                        "name": "Nginx: Connections active",
+                        "type": "DEPENDENT",
+                        "key": "nginx.connections.active",
+                        "delay": "0",
+                        "history": "7d",
+                        "trends": "90d",
+                        "description": "The current number of active client connections including waiting connections.",
+                        "preprocessing": [
+                            {
+                                "type": "JSONPATH",
+                                "parameters": [
+                                    "$.connections.active"
+                                ]
+                            },
+                            {
+                                "type": "DISCARD_UNCHANGED_HEARTBEAT",
+                                "parameters": [
+                                    "5m"
+                                ]
+                            }
+                        ],
+                        "master_item": {
+                            "key": "nginx.get_stats"
+                        },
+                        "tags": [
+                            {
+                                "tag": "application",
+                                "value": "nginx"
+                            },
+                            {
+                                "tag": "component",
+                                "value": "connections"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "482b0d4cd81049ecb8dfb98a68c0588c",
+                        "name": "Nginx: Requests dropped per second",
+                        "type": "DEPENDENT",
+                        "key": "nginx.connections.dropped.rate",
+                        "delay": "0",
+                        "history": "7d",
+                        "value_type": "FLOAT",
+                        "trends": "90d",
+                        "description": "The total number of dropped client connections.",
+                        "preprocessing": [
+                            {
+                                "type": "CHANGE_PER_SECOND",
+                                "parameters": [
+                                    ""
+                                ]
+                            },
+                            {
+                                "type": "DISCARD_UNCHANGED_HEARTBEAT",
+                                "parameters": [
+                                    "5m"
+                                ]
+                            }
+                        ],
+                        "master_item": {
+                            "key": "nginx.connections.dropped.total"
+                        },
+                        "tags": [
+                            {
+                                "tag": "application",
+                                "value": "nginx"
+                            },
+                            {
+                                "tag": "component",
+                                "value": "connections"
+                            }
+                        ],
+                        "triggers": [
+                            {
+                                "uuid": "5d9d6ccedd904540b5f51683b24bdabf",
+                                "expression": "min(/Nginx VH by HTTP/nginx.connections.dropped.rate,5m) > {$NGINX.DROP_RATE.MAX.WARN}",
+                                "name": "Nginx: High connections drop rate",
+                                "event_name": "Nginx: High connections drop rate (more than {$NGINX.DROP_RATE.MAX.WARN} for 5m)",
+                                "opdata": "Current rate: {ITEM.LASTVALUE1}",
+                                "priority": "WARNING",
+                                "description": "The rate of dropping connections has been greater than {$NGINX.DROP_RATE.MAX.WARN} for the last 5 minutes.",
+                                "dependencies": [
+                                    {
+                                        "name": "Nginx: Service is down",
+                                        "expression": "last(/Nginx VH by HTTP/net.tcp.service[http,\"{HOST.IP}\",\"{$NGINX.VH_STATUS.PORT}\"])=0"
+                                    }
+                                ],
+                                "tags": [
+                                    {
+                                        "tag": "application",
+                                        "value": "nginx"
+                                    },
+                                    {
+                                        "tag": "scope",
+                                        "value": "performance"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "cc6012f491b14b51b9ad76fbbd0a3a8b",
+                        "name": "Nginx: Requests dropped total",
+                        "type": "CALCULATED",
+                        "key": "nginx.connections.dropped.total",
+                        "history": "7d",
+                        "value_type": "FLOAT",
+                        "trends": "90d",
+                        "params": "last(//nginx.connections.accepted.total)-last(//nginx.connections.handled.total)",
+                        "description": "The total number of dropped client connections.",
+                        "preprocessing": [
+                            {
+                                "type": "DISCARD_UNCHANGED_HEARTBEAT",
+                                "parameters": [
+                                    "5m"
+                                ]
+                            }
+                        ],
+                        "tags": [
+                            {
+                                "tag": "application",
+                                "value": "nginx"
+                            },
+                            {
+                                "tag": "component",
+                                "value": "connections"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "de047b96046d444abd04c20061564301",
+                        "name": "Nginx: Requests handled per second",
+                        "type": "DEPENDENT",
+                        "key": "nginx.connections.handled.rate",
+                        "delay": "0",
+                        "history": "7d",
+                        "value_type": "FLOAT",
+                        "trends": "90d",
+                        "description": "The total number of handled connections. Generally, the parameter value is the same as for the accepted connections, unless some resource limits have been reached (for example, the `worker_connections limit`).",
+                        "preprocessing": [
+                            {
+                                "type": "JSONPATH",
+                                "parameters": [
+                                    "$.connections.handled"
+                                ]
+                            },
+                            {
+                                "type": "CHANGE_PER_SECOND",
+                                "parameters": [
+                                    ""
+                                ]
+                            },
+                            {
+                                "type": "DISCARD_UNCHANGED_HEARTBEAT",
+                                "parameters": [
+                                    "5m"
+                                ]
+                            }
+                        ],
+                        "master_item": {
+                            "key": "nginx.get_stats"
+                        },
+                        "tags": [
+                            {
+                                "tag": "application",
+                                "value": "nginx"
+                            },
+                            {
+                                "tag": "component",
+                                "value": "connections"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "9933d4d302134eef85a0ea7d7bc331fe",
+                        "name": "Nginx: Requests handled total",
+                        "type": "DEPENDENT",
+                        "key": "nginx.connections.handled.total",
+                        "delay": "0",
+                        "history": "7d",
+                        "value_type": "FLOAT",
+                        "trends": "90d",
+                        "description": "The total number of handled connections. Generally, the parameter value is the same as for the accepted connections, unless some resource limits have been reached (for example, the `worker_connections limit`).",
+                        "preprocessing": [
+                            {
+                                "type": "JSONPATH",
+                                "parameters": [
+                                    "$.connections.handled"
+                                ]
+                            },
+                            {
+                                "type": "DISCARD_UNCHANGED_HEARTBEAT",
+                                "parameters": [
+                                    "5m"
+                                ]
+                            }
+                        ],
+                        "master_item": {
+                            "key": "nginx.get_stats"
+                        },
+                        "tags": [
+                            {
+                                "tag": "application",
+                                "value": "nginx"
+                            },
+                            {
+                                "tag": "component",
+                                "value": "connections"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "79954a6263e0411f96d54cffc57f2cf5",
+                        "name": "Nginx: Connections reading",
+                        "type": "DEPENDENT",
+                        "key": "nginx.connections.reading",
+                        "delay": "0",
+                        "history": "7d",
+                        "trends": "90d",
+                        "description": "The current number of connections where Nginx is reading the request header.",
+                        "preprocessing": [
+                            {
+                                "type": "JSONPATH",
+                                "parameters": [
+                                    "$.connections.reading"
+                                ]
+                            },
+                            {
+                                "type": "DISCARD_UNCHANGED_HEARTBEAT",
+                                "parameters": [
+                                    "5m"
+                                ]
+                            }
+                        ],
+                        "master_item": {
+                            "key": "nginx.get_stats"
+                        },
+                        "tags": [
+                            {
+                                "tag": "application",
+                                "value": "nginx"
+                            },
+                            {
+                                "tag": "component",
+                                "value": "connections"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "5454c2fcddb34c0aaa218d233b6f66ae",
+                        "name": "Nginx: Connections waiting",
+                        "type": "DEPENDENT",
+                        "key": "nginx.connections.waiting",
+                        "delay": "0",
+                        "history": "7d",
+                        "trends": "90d",
+                        "description": "The current number of idle client connections waiting for a request.",
+                        "preprocessing": [
+                            {
+                                "type": "JSONPATH",
+                                "parameters": [
+                                    "$.connections.waiting"
+                                ]
+                            },
+                            {
+                                "type": "DISCARD_UNCHANGED_HEARTBEAT",
+                                "parameters": [
+                                    "5m"
+                                ]
+                            }
+                        ],
+                        "master_item": {
+                            "key": "nginx.get_stats"
+                        },
+                        "tags": [
+                            {
+                                "tag": "application",
+                                "value": "nginx"
+                            },
+                            {
+                                "tag": "component",
+                                "value": "connections"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "eb3df4ae1fbe48a5a25546b2053c2963",
+                        "name": "Nginx: Connections writing",
+                        "type": "DEPENDENT",
+                        "key": "nginx.connections.writing",
+                        "delay": "0",
+                        "history": "7d",
+                        "trends": "90d",
+                        "description": "The current number of connections where Nginx is writing a response back to the client.",
+                        "preprocessing": [
+                            {
+                                "type": "JSONPATH",
+                                "parameters": [
+                                    "$.connections.writing"
+                                ]
+                            },
+                            {
+                                "type": "DISCARD_UNCHANGED_HEARTBEAT",
+                                "parameters": [
+                                    "5m"
+                                ]
+                            }
+                        ],
+                        "master_item": {
+                            "key": "nginx.get_stats"
+                        },
+                        "tags": [
+                            {
+                                "tag": "application",
+                                "value": "nginx"
+                            },
+                            {
+                                "tag": "component",
+                                "value": "connections"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "f75ce75d244a4867ad00eae314584d08",
+                        "name": "Nginx: Get status page",
+                        "key": "nginx.get_stats",
+                        "history": "0",
+                        "value_type": "TEXT",
+                        "trends": "0",
+                        "description": "The following status information is provided:\n`Active connections` - the current number of active client connections including waiting connections.\n`Accepted` - the total number of accepted client connections.\n`Handled` - the total number of handled connections. Generally, the parameter value is the same as for the accepted connections, unless some resource limits have been reached (for example, the `worker_connections` limit).\n`Requests` - the total number of client requests.\n`Reading` - the current number of connections where Nginx is reading the request header.\n`Writing` - the current number of connections where Nginx is writing a response back to the client.\n`Waiting` - the current number of idle client connections waiting for a request.",
+                        "tags": [
+                            {
+                                "tag": "application",
+                                "value": "nginx"
+                            }
+                        ],
+                        "triggers": [
+                            {
+                                "uuid": "4ec80a8d83644249a13f7ee1dc9493df",
+                                "expression": "nodata(/Nginx VH by HTTP/nginx.get_stats,30m)=1",
+                                "name": "Nginx: Failed to fetch status page",
+                                "event_name": "Nginx: Failed to fetch stub status page (or no data for 30m)",
+                                "priority": "WARNING",
+                                "description": "Zabbix has not received any data for items for the last 30 minutes.",
+                                "manual_close": "YES",
+                                "dependencies": [
+                                    {
+                                        "name": "Nginx: Service is down",
+                                        "expression": "last(/Nginx VH by HTTP/net.tcp.service[http,\"{HOST.IP}\",\"{$NGINX.VH_STATUS.PORT}\"])=0"
+                                    }
+                                ],
+                                "tags": [
+                                    {
+                                        "tag": "application",
+                                        "value": "nginx"
+                                    },
+                                    {
+                                        "tag": "scope",
+                                        "value": "availability"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "2e3d10ea41e449bcb7e6fcf2cfe397f4",
+                        "name": "Nginx: Requests total",
+                        "type": "DEPENDENT",
+                        "key": "nginx.requests.total",
+                        "delay": "0",
+                        "history": "7d",
+                        "trends": "90d",
+                        "description": "The total number of client requests.",
+                        "preprocessing": [
+                            {
+                                "type": "JSONPATH",
+                                "parameters": [
+                                    "$.connections.requests"
+                                ]
+                            },
+                            {
+                                "type": "DISCARD_UNCHANGED_HEARTBEAT",
+                                "parameters": [
+                                    "5m"
+                                ]
+                            }
+                        ],
+                        "master_item": {
+                            "key": "nginx.get_stats"
+                        },
+                        "tags": [
+                            {
+                                "tag": "application",
+                                "value": "nginx"
+                            },
+                            {
+                                "tag": "component",
+                                "value": "requests"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "35a77fbac13c4cdaa46a53eaff7d004e",
+                        "name": "Nginx: Requests total per second",
+                        "type": "DEPENDENT",
+                        "key": "nginx.requests.total.rate",
+                        "delay": "0",
+                        "history": "7d",
+                        "value_type": "FLOAT",
+                        "trends": "90d",
+                        "description": "The total number of client requests.",
+                        "preprocessing": [
+                            {
+                                "type": "JSONPATH",
+                                "parameters": [
+                                    "$.connections.requests"
+                                ]
+                            },
+                            {
+                                "type": "CHANGE_PER_SECOND",
+                                "parameters": [
+                                    ""
+                                ]
+                            },
+                            {
+                                "type": "DISCARD_UNCHANGED_HEARTBEAT",
+                                "parameters": [
+                                    "5m"
+                                ]
+                            }
+                        ],
+                        "master_item": {
+                            "key": "nginx.get_stats"
+                        },
+                        "tags": [
+                            {
+                                "tag": "application",
+                                "value": "nginx"
+                            },
+                            {
+                                "tag": "component",
+                                "value": "requests"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "6684ac00cec44b66928df787a9607884",
+                        "name": "Nginx: Version",
+                        "type": "DEPENDENT",
+                        "key": "nginx.version",
+                        "delay": "0",
+                        "history": "7d",
+                        "value_type": "CHAR",
+                        "trends": "0",
+                        "preprocessing": [
+                            {
+                                "type": "JSONPATH",
+                                "parameters": [
+                                    "$.nginxVersion"
+                                ]
+                            },
+                            {
+                                "type": "DISCARD_UNCHANGED_HEARTBEAT",
+                                "parameters": [
+                                    "1d"
+                                ]
+                            }
+                        ],
+                        "master_item": {
+                            "key": "nginx.get_stats"
+                        },
+                        "tags": [
+                            {
+                                "tag": "application",
+                                "value": "nginx"
+                            },
+                            {
+                                "tag": "component",
+                                "value": "application"
+                            }
+                        ],
+                        "triggers": [
+                            {
+                                "uuid": "dcfb23a454ff4daca8770c8c15c13514",
+                                "expression": "last(/Nginx VH by HTTP/nginx.version,#1)<>last(/Nginx VH by HTTP/nginx.version,#2) and length(last(/Nginx VH by HTTP/nginx.version))>0",
+                                "name": "Nginx: Version has changed",
+                                "event_name": "Nginx: Version has changed (new version: {ITEM.VALUE})",
+                                "priority": "INFO",
+                                "description": "The Nginx version has changed. Acknowledge to close the problem manually.",
+                                "manual_close": "YES",
+                                "tags": [
+                                    {
+                                        "tag": "application",
+                                        "value": "nginx"
+                                    },
+                                    {
+                                        "tag": "scope",
+                                        "value": "notice"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                "discovery_rules": [
+                    {
+                        "uuid": "b92380118bd14c43917a46fa11d83939",
+                        "name": "Server zones discovery new",
+                        "key": "serverzones.discovery",
+                        "delay": "1h",
+                        "filter": {
+                            "conditions": [
+                                {
+                                    "macro": "{#ZONE}",
+                                    "value": "\\*",
+                                    "operator": "NOT_MATCHES_REGEX",
+                                    "formulaid": "A"
+                                }
+                            ]
+                        },
+                        "item_prototypes": [
+                            {
+                                "uuid": "c7b4a27669324d53a01f993b9e3e4c2d",
+                                "name": "VH [{#ZONE}]: Bytes received",
+                                "type": "DEPENDENT",
+                                "key": "nginx.inBytes[{#ZONE}]",
+                                "delay": "0",
+                                "history": "7d",
+                                "trends": "90d",
+                                "units": "bytes",
+                                "preprocessing": [
+                                    {
+                                        "type": "JSONPATH",
+                                        "parameters": [
+                                            "$.inBytes"
+                                        ]
+                                    },
+                                    {
+                                        "type": "DISCARD_UNCHANGED_HEARTBEAT",
+                                        "parameters": [
+                                            "5m"
+                                        ]
+                                    }
+                                ],
+                                "master_item": {
+                                    "key": "nginx.vh_get_stats[{#ZONE}]"
+                                },
+                                "tags": [
+                                    {
+                                        "tag": "application",
+                                        "value": "nginx"
+                                    },
+                                    {
+                                        "tag": "virtual host",
+                                        "value": "{#ZONE}"
+                                    }
+                                ]
+                            },
+                            {
+                                "uuid": "c3899fb445ae40b694d2e55935ad3e0f",
+                                "name": "VH [{#ZONE}]: Bytes sent",
+                                "type": "DEPENDENT",
+                                "key": "nginx.outBytes[{#ZONE}]",
+                                "delay": "0",
+                                "history": "7d",
+                                "trends": "90d",
+                                "units": "bytes",
+                                "preprocessing": [
+                                    {
+                                        "type": "JSONPATH",
+                                        "parameters": [
+                                            "$.outBytes"
+                                        ]
+                                    },
+                                    {
+                                        "type": "DISCARD_UNCHANGED_HEARTBEAT",
+                                        "parameters": [
+                                            "5m"
+                                        ]
+                                    }
+                                ],
+                                "master_item": {
+                                    "key": "nginx.vh_get_stats[{#ZONE}]"
+                                },
+                                "tags": [
+                                    {
+                                        "tag": "application",
+                                        "value": "nginx"
+                                    },
+                                    {
+                                        "tag": "virtual host",
+                                        "value": "{#ZONE}"
+                                    }
+                                ]
+                            },
+                            {
+                                "uuid": "eff54cf2a9524279bd117532c4d07bcd",
+                                "name": "VH [{#ZONE}]: Requests total",
+                                "type": "DEPENDENT",
+                                "key": "nginx.requestCounter[{#ZONE}]",
+                                "delay": "0",
+                                "history": "7d",
+                                "value_type": "FLOAT",
+                                "trends": "90d",
+                                "preprocessing": [
+                                    {
+                                        "type": "JSONPATH",
+                                        "parameters": [
+                                            "$.requestCounter"
+                                        ]
+                                    },
+                                    {
+                                        "type": "DISCARD_UNCHANGED_HEARTBEAT",
+                                        "parameters": [
+                                            "5m"
+                                        ]
+                                    }
+                                ],
+                                "master_item": {
+                                    "key": "nginx.vh_get_stats[{#ZONE}]"
+                                },
+                                "tags": [
+                                    {
+                                        "tag": "application",
+                                        "value": "nginx"
+                                    },
+                                    {
+                                        "tag": "virtual host",
+                                        "value": "{#ZONE}"
+                                    }
+                                ]
+                            },
+                            {
+                                "uuid": "74dfb4cfef5e474887377d613f9dafa6",
+                                "name": "VH [{#ZONE}]: Accumulated request processing time",
+                                "type": "DEPENDENT",
+                                "key": "nginx.requestMsecCounter[{#ZONE}]",
+                                "delay": "0",
+                                "history": "7d",
+                                "trends": "90d",
+                                "units": "ms",
+                                "preprocessing": [
+                                    {
+                                        "type": "JSONPATH",
+                                        "parameters": [
+                                            "$.requestMsecCounter"
+                                        ]
+                                    },
+                                    {
+                                        "type": "DISCARD_UNCHANGED_HEARTBEAT",
+                                        "parameters": [
+                                            "5m"
+                                        ]
+                                    }
+                                ],
+                                "master_item": {
+                                    "key": "nginx.vh_get_stats[{#ZONE}]"
+                                },
+                                "tags": [
+                                    {
+                                        "tag": "application",
+                                        "value": "nginx"
+                                    },
+                                    {
+                                        "tag": "virtual host",
+                                        "value": "{#ZONE}"
+                                    }
+                                ]
+                            },
+                            {
+                                "uuid": "0a242597d65647a1afcfea95090b9882",
+                                "name": "VH [{#ZONE}]: The request processing times",
+                                "type": "DEPENDENT",
+                                "key": "nginx.requestMsecs.msecs[{#ZONE}]",
+                                "delay": "0",
+                                "history": "7d",
+                                "value_type": "TEXT",
+                                "trends": "0",
+                                "status": "DISABLED",
+                                "preprocessing": [
+                                    {
+                                        "type": "JSONPATH",
+                                        "parameters": [
+                                            "$.requestMsecs.msecs[*]"
+                                        ]
+                                    }
+                                ],
+                                "master_item": {
+                                    "key": "nginx.vh_get_stats[{#ZONE}]"
+                                },
+                                "tags": [
+                                    {
+                                        "tag": "application",
+                                        "value": "nginx"
+                                    },
+                                    {
+                                        "tag": "virtual host",
+                                        "value": "{#ZONE}"
+                                    }
+                                ]
+                            },
+                            {
+                                "uuid": "db87209bc0c74aad87facf8ded8027fc",
+                                "name": "VH [{#ZONE}]: The times at request processing times",
+                                "type": "DEPENDENT",
+                                "key": "nginx.requestMsecs.times[{#ZONE}]",
+                                "delay": "0",
+                                "history": "7d",
+                                "value_type": "TEXT",
+                                "trends": "0",
+                                "status": "DISABLED",
+                                "preprocessing": [
+                                    {
+                                        "type": "JSONPATH",
+                                        "parameters": [
+                                            "$.requestMsecs.times[*]"
+                                        ]
+                                    }
+                                ],
+                                "master_item": {
+                                    "key": "nginx.vh_get_stats[{#ZONE}]"
+                                },
+                                "tags": [
+                                    {
+                                        "tag": "application",
+                                        "value": "nginx"
+                                    },
+                                    {
+                                        "tag": "virtual host",
+                                        "value": "{#ZONE}"
+                                    }
+                                ]
+                            },
+                            {
+                                "uuid": "2f927840e707459e86d839a5f27127d5",
+                                "name": "VH [{#ZONE}]: Average of request processing times",
+                                "type": "DEPENDENT",
+                                "key": "nginx.requestMsec[{#ZONE}]",
+                                "delay": "0",
+                                "history": "7d",
+                                "trends": "90d",
+                                "units": "ms",
+                                "preprocessing": [
+                                    {
+                                        "type": "JSONPATH",
+                                        "parameters": [
+                                            "$.requestMsec"
+                                        ]
+                                    },
+                                    {
+                                        "type": "DISCARD_UNCHANGED_HEARTBEAT",
+                                        "parameters": [
+                                            "5m"
+                                        ]
+                                    }
+                                ],
+                                "master_item": {
+                                    "key": "nginx.vh_get_stats[{#ZONE}]"
+                                },
+                                "tags": [
+                                    {
+                                        "tag": "application",
+                                        "value": "nginx"
+                                    },
+                                    {
+                                        "tag": "virtual host",
+                                        "value": "{#ZONE}"
+                                    }
+                                ]
+                            },
+                            {
+                                "uuid": "8978902d206f458893dfbb1b4f4e4321",
+                                "name": "VH [{#ZONE}]: Requests per second",
+                                "type": "DEPENDENT",
+                                "key": "nginx.requestsPerSecond[{#ZONE}]",
+                                "delay": "0",
+                                "history": "7d",
+                                "value_type": "FLOAT",
+                                "trends": "90d",
+                                "preprocessing": [
+                                    {
+                                        "type": "JSONPATH",
+                                        "parameters": [
+                                            "$.requestCounter"
+                                        ]
+                                    },
+                                    {
+                                        "type": "CHANGE_PER_SECOND",
+                                        "parameters": [
+                                            ""
+                                        ]
+                                    },
+                                    {
+                                        "type": "DISCARD_UNCHANGED_HEARTBEAT",
+                                        "parameters": [
+                                            "5m"
+                                        ]
+                                    }
+                                ],
+                                "master_item": {
+                                    "key": "nginx.vh_get_stats[{#ZONE}]"
+                                },
+                                "tags": [
+                                    {
+                                        "tag": "application",
+                                        "value": "nginx"
+                                    },
+                                    {
+                                        "tag": "virtual host",
+                                        "value": "{#ZONE}"
+                                    }
+                                ]
+                            },
+                            {
+                                "uuid": "880dfdc4fc4f4465ab50de9c2d6bad6f",
+                                "name": "VH [{#ZONE}]: Responses 1xx",
+                                "type": "DEPENDENT",
+                                "key": "nginx.responses_1xx[{#ZONE}]",
+                                "delay": "0",
+                                "history": "7d",
+                                "trends": "90d",
+                                "preprocessing": [
+                                    {
+                                        "type": "JSONPATH",
+                                        "parameters": [
+                                            "$.responses.1xx"
+                                        ]
+                                    },
+                                    {
+                                        "type": "DISCARD_UNCHANGED_HEARTBEAT",
+                                        "parameters": [
+                                            "5m"
+                                        ]
+                                    }
+                                ],
+                                "master_item": {
+                                    "key": "nginx.vh_get_stats[{#ZONE}]"
+                                },
+                                "tags": [
+                                    {
+                                        "tag": "application",
+                                        "value": "nginx"
+                                    },
+                                    {
+                                        "tag": "virtual host",
+                                        "value": "{#ZONE}"
+                                    }
+                                ]
+                            },
+                            {
+                                "uuid": "46a55eb9e29d46a8990c5a59219333ab",
+                                "name": "VH [{#ZONE}]: Responses 2xx",
+                                "type": "DEPENDENT",
+                                "key": "nginx.responses_2xx[{#ZONE}]",
+                                "delay": "0",
+                                "history": "7d",
+                                "trends": "90d",
+                                "preprocessing": [
+                                    {
+                                        "type": "JSONPATH",
+                                        "parameters": [
+                                            "$.responses.2xx"
+                                        ]
+                                    },
+                                    {
+                                        "type": "DISCARD_UNCHANGED_HEARTBEAT",
+                                        "parameters": [
+                                            "5m"
+                                        ]
+                                    }
+                                ],
+                                "master_item": {
+                                    "key": "nginx.vh_get_stats[{#ZONE}]"
+                                },
+                                "tags": [
+                                    {
+                                        "tag": "application",
+                                        "value": "nginx"
+                                    },
+                                    {
+                                        "tag": "virtual host",
+                                        "value": "{#ZONE}"
+                                    }
+                                ]
+                            },
+                            {
+                                "uuid": "4135d10d28b64c6486de4f557864d3c6",
+                                "name": "VH [{#ZONE}]: Responses 3xx",
+                                "type": "DEPENDENT",
+                                "key": "nginx.responses_3xx[{#ZONE}]",
+                                "delay": "0",
+                                "history": "7d",
+                                "trends": "90d",
+                                "preprocessing": [
+                                    {
+                                        "type": "JSONPATH",
+                                        "parameters": [
+                                            "$.responses.3xx"
+                                        ]
+                                    },
+                                    {
+                                        "type": "DISCARD_UNCHANGED_HEARTBEAT",
+                                        "parameters": [
+                                            "5m"
+                                        ]
+                                    }
+                                ],
+                                "master_item": {
+                                    "key": "nginx.vh_get_stats[{#ZONE}]"
+                                },
+                                "tags": [
+                                    {
+                                        "tag": "application",
+                                        "value": "nginx"
+                                    },
+                                    {
+                                        "tag": "virtual host",
+                                        "value": "{#ZONE}"
+                                    }
+                                ]
+                            },
+                            {
+                                "uuid": "40fb7a2952fa44fe94936934752d3237",
+                                "name": "VH [{#ZONE}]: Responses 4xx",
+                                "type": "DEPENDENT",
+                                "key": "nginx.responses_4xx[{#ZONE}]",
+                                "delay": "0",
+                                "history": "7d",
+                                "trends": "90d",
+                                "preprocessing": [
+                                    {
+                                        "type": "JSONPATH",
+                                        "parameters": [
+                                            "$.responses.4xx"
+                                        ]
+                                    },
+                                    {
+                                        "type": "DISCARD_UNCHANGED_HEARTBEAT",
+                                        "parameters": [
+                                            "5m"
+                                        ]
+                                    }
+                                ],
+                                "master_item": {
+                                    "key": "nginx.vh_get_stats[{#ZONE}]"
+                                },
+                                "tags": [
+                                    {
+                                        "tag": "application",
+                                        "value": "nginx"
+                                    },
+                                    {
+                                        "tag": "virtual host",
+                                        "value": "{#ZONE}"
+                                    }
+                                ]
+                            },
+                            {
+                                "uuid": "3b28ceeffa0947899eb5326fe2513a5a",
+                                "name": "VH [{#ZONE}]: Responses 5xx",
+                                "type": "DEPENDENT",
+                                "key": "nginx.responses_5xx[{#ZONE}]",
+                                "delay": "0",
+                                "history": "7d",
+                                "trends": "90d",
+                                "preprocessing": [
+                                    {
+                                        "type": "JSONPATH",
+                                        "parameters": [
+                                            "$.responses.5xx"
+                                        ]
+                                    },
+                                    {
+                                        "type": "DISCARD_UNCHANGED_HEARTBEAT",
+                                        "parameters": [
+                                            "5m"
+                                        ]
+                                    }
+                                ],
+                                "master_item": {
+                                    "key": "nginx.vh_get_stats[{#ZONE}]"
+                                },
+                                "tags": [
+                                    {
+                                        "tag": "application",
+                                        "value": "nginx"
+                                    },
+                                    {
+                                        "tag": "virtual host",
+                                        "value": "{#ZONE}"
+                                    }
+                                ]
+                            },
+                            {
+                                "uuid": "3b7b252bca9c415b8d8260ad0b9dd9e3",
+                                "name": "VH [{#ZONE}] Get stats",
+                                "key": "nginx.vh_get_stats[{#ZONE}]",
+                                "history": "0",
+                                "value_type": "TEXT",
+                                "trends": "0",
+                                "tags": [
+                                    {
+                                        "tag": "application",
+                                        "value": "nginx"
+                                    }
+                                ]
+                            }
+                        ],
+                        "graph_prototypes": [
+                            {
+                                "uuid": "909f6780db5e4901af900f819cba377c",
+                                "name": "VH [{#ZONE}]: Network traffic",
+                                "graph_items": [
+                                    {
+                                        "color": "388E3C",
+                                        "yaxisside": "RIGHT",
+                                        "calc_fnc": "ALL",
+                                        "item": {
+                                            "host": "Nginx VH by HTTP",
+                                            "key": "nginx.inBytes[{#ZONE}]"
+                                        }
+                                    },
+                                    {
+                                        "sortorder": "1",
+                                        "color": "FF6F00",
+                                        "yaxisside": "RIGHT",
+                                        "calc_fnc": "ALL",
+                                        "item": {
+                                            "host": "Nginx VH by HTTP",
+                                            "key": "nginx.outBytes[{#ZONE}]"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "uuid": "5f47aa0496e748ca80014c8e101bb4d9",
+                                "name": "VH [{#ZONE}]: Requests per second",
+                                "graph_items": [
+                                    {
+                                        "color": "388E3C",
+                                        "yaxisside": "RIGHT",
+                                        "calc_fnc": "ALL",
+                                        "item": {
+                                            "host": "Nginx VH by HTTP",
+                                            "key": "nginx.requestsPerSecond[{#ZONE}]"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "uuid": "bd7d8dcd0dac4be7b3e2be26dc6cdc52",
+                                "name": "VH [{#ZONE}]: Requests total",
+                                "graph_items": [
+                                    {
+                                        "color": "1A7C11",
+                                        "yaxisside": "RIGHT",
+                                        "calc_fnc": "ALL",
+                                        "item": {
+                                            "host": "Nginx VH by HTTP",
+                                            "key": "nginx.requestCounter[{#ZONE}]"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "uuid": "0c60cf00544f45e7b2d900ff04d0b8a0",
+                                "name": "VH [{#ZONE}]: Responses by code",
+                                "graph_items": [
+                                    {
+                                        "color": "33691E",
+                                        "yaxisside": "RIGHT",
+                                        "calc_fnc": "ALL",
+                                        "item": {
+                                            "host": "Nginx VH by HTTP",
+                                            "key": "nginx.responses_1xx[{#ZONE}]"
+                                        }
+                                    },
+                                    {
+                                        "sortorder": "1",
+                                        "color": "0277BD",
+                                        "yaxisside": "RIGHT",
+                                        "calc_fnc": "ALL",
+                                        "item": {
+                                            "host": "Nginx VH by HTTP",
+                                            "key": "nginx.responses_2xx[{#ZONE}]"
+                                        }
+                                    },
+                                    {
+                                        "sortorder": "2",
+                                        "color": "F63100",
+                                        "yaxisside": "RIGHT",
+                                        "calc_fnc": "ALL",
+                                        "item": {
+                                            "host": "Nginx VH by HTTP",
+                                            "key": "nginx.responses_3xx[{#ZONE}]"
+                                        }
+                                    },
+                                    {
+                                        "sortorder": "3",
+                                        "color": "FF6F00",
+                                        "yaxisside": "RIGHT",
+                                        "calc_fnc": "ALL",
+                                        "item": {
+                                            "host": "Nginx VH by HTTP",
+                                            "key": "nginx.responses_4xx[{#ZONE}]"
+                                        }
+                                    },
+                                    {
+                                        "sortorder": "4",
+                                        "color": "00FFFF",
+                                        "yaxisside": "RIGHT",
+                                        "calc_fnc": "ALL",
+                                        "item": {
+                                            "host": "Nginx VH by HTTP",
+                                            "key": "nginx.responses_5xx[{#ZONE}]"
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                "tags": [
+                    {
+                        "tag": "class",
+                        "value": "software"
+                    },
+                    {
+                        "tag": "target",
+                        "value": "nginx"
+                    }
+                ],
+                "macros": [
+                    {
+                        "macro": "{$NGINX.DROP_RATE.MAX.WARN}",
+                        "value": "1",
+                        "description": "The critical rate of the dropped connections for a trigger expression."
+                    },
+                    {
+                        "macro": "{$NGINX.RESPONSE_TIME.MAX.WARN}",
+                        "value": "10",
+                        "description": "The maximum response time of Nginx expressed in seconds for a trigger expression."
+                    },
+                    {
+                        "macro": "{$NGINX.VH_STATUS.HOST}",
+                        "value": "localhost",
+                        "description": "The hostname or IP address of the Nginx host or Nginx container of a stub_status."
+                    },
+                    {
+                        "macro": "{$NGINX.VH_STATUS.PATH}",
+                        "value": "vh_nginx_status",
+                        "description": "The path of the `Nginx stub_status` page."
+                    },
+                    {
+                        "macro": "{$NGINX.VH_STATUS.PORT}",
+                        "value": "80",
+                        "description": "The port of the `Nginx stub_status` host or container."
+                    },
+                    {
+                        "macro": "{$NGINX.VH_STATUS.SCHEME}",
+                        "value": "http",
+                        "description": "The protocol http or https of Nginx stub_status host or container."
+                    }
+                ],
+                "dashboards": [
+                    {
+                        "uuid": "e08eae84159e43deb3f78ed4c22e9c03",
+                        "name": "Nginx performance",
+                        "pages": [
+                            {
+                                "widgets": [
+                                    {
+                                        "type": "graph",
+                                        "width": "25",
+                                        "height": "7",
+                                        "fields": [
+                                            {
+                                                "type": "GRAPH",
+                                                "name": "graphid.0",
+                                                "value": {
+                                                    "host": "Nginx VH by HTTP",
+                                                    "name": "Nginx: Connections by state"
+                                                }
+                                            },
+                                            {
+                                                "type": "STRING",
+                                                "name": "reference",
+                                                "value": "NIRBD"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "type": "graph",
+                                        "x": "25",
+                                        "width": "24",
+                                        "height": "7",
+                                        "fields": [
+                                            {
+                                                "type": "GRAPH",
+                                                "name": "graphid.0",
+                                                "value": {
+                                                    "host": "Nginx VH by HTTP",
+                                                    "name": "Nginx: Connections per second"
+                                                }
+                                            },
+                                            {
+                                                "type": "STRING",
+                                                "name": "reference",
+                                                "value": "ASFWP"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "type": "graph",
+                                        "x": "49",
+                                        "width": "23",
+                                        "height": "7",
+                                        "fields": [
+                                            {
+                                                "type": "GRAPH",
+                                                "name": "graphid.0",
+                                                "value": {
+                                                    "host": "Nginx VH by HTTP",
+                                                    "name": "Nginx: Requests per second"
+                                                }
+                                            },
+                                            {
+                                                "type": "STRING",
+                                                "name": "reference",
+                                                "value": "TRXRB"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                "valuemaps": [
+                    {
+                        "uuid": "152f704b524a46d2884226e21f3a7c53",
+                        "name": "Service state",
+                        "mappings": [
+                            {
+                                "value": "0",
+                                "newvalue": "Down"
+                            },
+                            {
+                                "value": "1",
+                                "newvalue": "Up"
+                            }
+                        ]
+                    }
+                ]
+            }
+        ],
+        "graphs": [
+            {
+                "uuid": "f36206aa82e44369bf856c6aee0ecdf6",
+                "name": "Nginx: Connections by state",
+                "graph_items": [
+                    {
+                        "drawtype": "BOLD_LINE",
+                        "color": "199C0D",
+                        "item": {
+                            "host": "Nginx VH by HTTP",
+                            "key": "nginx.connections.active"
+                        }
+                    },
+                    {
+                        "sortorder": "1",
+                        "color": "F63100",
+                        "item": {
+                            "host": "Nginx VH by HTTP",
+                            "key": "nginx.connections.waiting"
+                        }
+                    },
+                    {
+                        "sortorder": "2",
+                        "color": "00611C",
+                        "item": {
+                            "host": "Nginx VH by HTTP",
+                            "key": "nginx.connections.writing"
+                        }
+                    },
+                    {
+                        "sortorder": "3",
+                        "color": "F7941D",
+                        "item": {
+                            "host": "Nginx VH by HTTP",
+                            "key": "nginx.connections.reading"
+                        }
+                    }
+                ]
+            },
+            {
+                "uuid": "07e9ab2d20ad4b08af6d50c19452aa8f",
+                "name": "Nginx: Connections per second",
+                "graph_items": [
+                    {
+                        "color": "199C0D",
+                        "item": {
+                            "host": "Nginx VH by HTTP",
+                            "key": "nginx.connections.accepted.rate"
+                        }
+                    },
+                    {
+                        "sortorder": "1",
+                        "color": "F63100",
+                        "item": {
+                            "host": "Nginx VH by HTTP",
+                            "key": "nginx.connections.handled.rate"
+                        }
+                    },
+                    {
+                        "sortorder": "2",
+                        "color": "00611C",
+                        "item": {
+                            "host": "Nginx VH by HTTP",
+                            "key": "nginx.connections.dropped.rate"
+                        }
+                    }
+                ]
+            },
+            {
+                "uuid": "7a699084dd024b47894f5457a8035cbb",
+                "name": "Nginx: Requests per second",
+                "graph_items": [
+                    {
+                        "drawtype": "GRADIENT_LINE",
+                        "color": "199C0D",
+                        "item": {
+                            "host": "Nginx VH by HTTP",
+                            "key": "nginx.requests.total.rate"
+                        }
+                    }
+                ]
+            }
+        ]
+    }
+}
